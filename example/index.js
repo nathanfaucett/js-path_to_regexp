@@ -5,8 +5,8 @@ var params = [],
 
     regexp = pathToRegexp("/parent/:parentId", params, false),
 
-    regexpEnd = pathToRegexp("/parent/:parentId/child/:id", params, true);
+    regexpEnd = pathToRegexp("/parent/:parentId/child/:id(.:format)", params, true);
 
 
 console.log(regexp.exec("/parent/1/child/1"));
-console.log(regexpEnd.exec("/parent/1/child/1"));
+console.log(regexpEnd.exec("/parent/1/child/1.json"));
