@@ -30,11 +30,7 @@ function pathToRegexp(path, params, end) {
                 regexp = subParts[1] || "[a-zA-Z0-9-_]";
 
                 pattern += "(" + regexp + "+?)";
-                params && params.push({
-                    name: part.slice(1),
-                    regexp: regexp,
-                    required: false
-                });
+                params && params.push(new Param(part.slice(1), regexp, false));
             } else {
                 pattern += part;
             }
@@ -51,11 +47,7 @@ function pathToRegexp(path, params, end) {
                 regexp = subParts[1] || "[a-zA-Z0-9-_]";
 
                 pattern += "(" + regexp + "+)";
-                params && params.push({
-                    name: part.slice(1),
-                    regexp: regexp,
-                    required: true
-                });
+                params && params.push(new Param(part.slice(1), regexp, true));
             } else {
                 pattern += part;
             }
@@ -97,4 +89,20 @@ pathToRegexp.format = function(path) {
     }
 
     return fmt || "/";
+};
+
+function Param(name, regexp, required) {
+    this.name = name;
+    this.regexp = regexp;
+    this.required = required;
+}
+
+Param.prototype.toJSON = function(json) {
+    json || (json = {});
+
+    json.name = this.name;
+    json.regexp = this.regexp;
+    json.required = this.required;
+
+    return json;
 };
