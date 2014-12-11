@@ -1,4 +1,4 @@
-var rePartsMatcher = /\.\w+|\.\:\w+|\/+\w+|\/\:\w+|\:\w+(\[.+?\])?|\(.+?\)/g,
+var rePartsMatcher = /\.\w+|\.\:\w+|\/+\w+|\/\:\w+(\[.+?\])?|\:\w+(\[.+?\])?|\(.+?\)/g,
     rePartMatcher = /\:?\w+|\[.+?\]/g,
     rePartReplacer = /[\(\)]|\[.+?\]/g;
 
@@ -60,7 +60,7 @@ function pathToRegexp(path, params, end) {
         pattern += "(?=\\/|$)";
     }
 
-    return new RegExp(pattern, "i");
+    return attachParams(new RegExp(pattern, "i"), params);
 }
 
 pathToRegexp.format = function(path) {
@@ -90,6 +90,11 @@ pathToRegexp.format = function(path) {
 
     return fmt || "/";
 };
+
+function attachParams(re, params) {
+    re.params = params;
+    return re;
+}
 
 function Param(name, regexp, required) {
     this.name = name;
