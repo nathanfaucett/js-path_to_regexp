@@ -1,55 +1,68 @@
+var isArray = require("is_array"),
+    isBoolean = require("is_boolean");
+
+
 var rePartsMatcher = /\.\w+|\.\:\w+|\/+\w+|\/\:\w+(\[.+?\])?|\:\w+(\[.+?\])?|\(.+?\)/g,
     rePartMatcher = /\:?\w+|\[.+?\]/g,
     rePartReplacer = /[\(\)]|\[.+?\]/g;
 
 
-module.exports = pathToRegexp;
+module.exports = pathToRegExp;
 
 
-function pathToRegexp(path, params, end) {
-    var parts = path.match(rePartsMatcher) || [],
+function pathToRegExp(path, params, end) {
+    var parts = (path + "").match(rePartsMatcher) || [],
         i = -1,
         length = parts.length - 1,
-        pattern, part, subParts, regexp;
+        pattern, part, subParts, subRegexp, regexp;
 
-    params && (params.length = 0);
+    if (isArray(params)) {
+        end = false;
+        params.length = 0;
+    } else if (isBoolean(params)) {
+        end = params;
+        params = [];
+    } else {
+        end = false;
+        params = [];
+    }
+
     pattern = "^";
 
     while (i++ < length) {
         part = parts[i];
-        if (part.length === 0) continue;
 
-        if (part[0] === "(") {
-            if (part[1] === "/" || part[1] === ".") {
-                pattern += "(?:\\" + part[1];
-            }
-            subParts = part.match(rePartMatcher);
-            part = subParts[0];
+        if (part.length !== 0) {
+            if (part[0] === "(") {
+                if (part[1] === "/" || part[1] === ".") {
+                    pattern += "(?:\\" + part[1];
+                }
+                subParts = part.match(rePartMatcher);
+                part = subParts[0];
 
-            if (part[0] === ":") {
-                regexp = subParts[1] || "[a-zA-Z0-9-_]";
+                if (part[0] === ":") {
+                    subRegexp = subParts[1] || "[a-zA-Z0-9-_]";
+                    pattern += "(" + subRegexp + "+?)";
+                    params[params.length] = new Param(part.slice(1), subRegexp, false);
+                } else {
+                    pattern += part;
+                }
 
-                pattern += "(" + regexp + "+?)";
-                params && params.push(new Param(part.slice(1), regexp, false));
+                pattern += ")?";
             } else {
-                pattern += part;
-            }
+                if (part[0] === "/" || part[0] === ".") {
+                    pattern += "\\" + part[0] + "+";
+                }
+                subParts = part.match(rePartMatcher);
+                part = subParts[0];
 
-            pattern += ")?";
-        } else {
-            if (part[0] === "/" || part[0] === ".") {
-                pattern += "\\" + part[0] + "+";
-            }
-            subParts = part.match(rePartMatcher);
-            part = subParts[0];
-
-            if (part[0] === ":") {
-                regexp = subParts[1] || "[a-zA-Z0-9-_]";
-
-                pattern += "(" + regexp + "+)";
-                params && params.push(new Param(part.slice(1), regexp, true));
-            } else {
-                pattern += part;
+                if (part[0] === ":") {
+                    subRegexp = subParts[1] || "[a-zA-Z0-9-_]";
+                    pattern += "(" + subRegexp + "+)";
+                    params[params.length] = new Param(part.slice(1), subRegexp, true);
+                } else {
+                    pattern += part;
+                }
             }
         }
     }
@@ -60,10 +73,13 @@ function pathToRegexp(path, params, end) {
         pattern += "(?=\\/|$)";
     }
 
-    return attachParams(new RegExp(pattern, "i"), params);
+    regexp = new RegExp(pattern, "i");
+    regexp.params = params;
+
+    return regexp;
 }
 
-pathToRegexp.format = function(path) {
+pathToRegExp.format = function(path) {
     var parts = path.match(rePartsMatcher) || [],
         i = -1,
         length = parts.length - 1,
@@ -72,29 +88,27 @@ pathToRegexp.format = function(path) {
 
     while (i++ < length) {
         part = parts[i];
-        if (!part) continue;
 
-        optional = false;
-        if (part[0] === "(") {
-            optional = true;
-        }
+        if (part) {
+            optional = false;
+            if (part[0] === "(") {
+                optional = true;
+            }
 
-        part = part.replace(rePartReplacer, "");
+            part = part.replace(rePartReplacer, "");
 
-        if (part[1] === ":") {
-            fmt += (optional ? "" : part[0]) + "%s";
-        } else {
-            fmt += part;
+            if (part[1] === ":") {
+                fmt += (optional ? "" : part[0]) + "%s";
+            } else {
+                fmt += part;
+            }
         }
     }
 
     return fmt || "/";
 };
 
-function attachParams(re, params) {
-    re.params = params;
-    return re;
-}
+pathToRegExp.Param = Param;
 
 function Param(name, regexp, required) {
     this.name = name;
@@ -103,7 +117,7 @@ function Param(name, regexp, required) {
 }
 
 Param.prototype.toJSON = function(json) {
-    json || (json = {});
+    json = json || {};
 
     json.name = this.name;
     json.regexp = this.regexp;
