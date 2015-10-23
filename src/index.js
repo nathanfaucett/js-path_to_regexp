@@ -17,7 +17,7 @@ function pathToRegExp(path, params, end) {
         pattern, part, subParts, subRegexp, regexp;
 
     if (isArray(params)) {
-        end = false;
+        end = !!end;
         params.length = 0;
     } else if (isBoolean(params)) {
         end = params;
