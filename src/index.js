@@ -1,5 +1,5 @@
-var isArray = require("is_array"),
-    isBoolean = require("is_boolean");
+var isArray = require("@nathanfaucett/is_array"),
+    isBoolean = require("@nathanfaucett/is_boolean");
 
 
 var rePartsMatcher = /\.\w+|\.\:\w+|\/+\w+|\/\:\w+(\[.+?\])?|\:\w+(\[.+?\])?|\(.+?\)/g,

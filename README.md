@@ -5,7 +5,7 @@ pathToRegexp for the browser and node.js
 
 
 ```javascript
-var pathToRegexp = require("path_to_regexp");
+var pathToRegexp = require("@nathanfaucett/path_to_regexp");
 
 
 var params = [],

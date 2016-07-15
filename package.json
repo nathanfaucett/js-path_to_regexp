@@ -1,5 +1,5 @@
 {
-  "name": "path_to_regexp",
+  "name": "@nathanfaucett/path_to_regexp",
   "version": "0.0.1",
   "description": "path to regexp for the browser and node.js",
   "repository": {
@@ -15,21 +15,21 @@
     "test": "npm run test-node",
     "test-node": "node ./test | ./node_modules/.bin/tap-spec",
     "test-node-raw": "node ./test",
-    "test-browser-local": "zuul --local 8080 --ui tape -- ./test"
+    "test-browser-local": "zuul --local 9999 --ui tape -- ./test"
   },
   "author": "Nathan Faucett",
   "license": "MIT",
   "readmeFilename": "README.md",
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-jshint": "^0.11.3",
-    "grunt-jsbeautifier": "^0.2.10",
+    "grunt": "^1.0.1",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-jsbeautifier": "^0.2.13",
     "tap-spec": "^4.1.0",
     "tape": "^4.2.0",
     "zuul": "^3.6.0"
   },
   "dependencies": {
-    "is_array": "git://github.com/nathanfaucett/is_array.git",
-    "is_boolean": "git://github.com/nathanfaucett/is_boolean.git"
+    "@nathanfaucett/is_array": "^0.0.1",
+    "@nathanfaucett/is_boolean": "^0.0.1"
   }
 }
