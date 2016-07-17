@@ -1,6 +1,6 @@
 {
   "name": "@nathanfaucett/path_to_regexp",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "path to regexp for the browser and node.js",
   "repository": {
     "type": "git",

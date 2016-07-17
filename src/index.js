@@ -2,9 +2,9 @@ var isArray = require("@nathanfaucett/is_array"),
     isBoolean = require("@nathanfaucett/is_boolean");
 
 
-var rePartsMatcher = /\.\w+|\.\:\w+|\/+\w+|\/\:\w+(\[.+?\])?|\:\w+(\[.+?\])?|\(.+?\)/g,
-    rePartMatcher = /\:?\w+|\[.+?\]/g,
-    rePartReplacer = /[\(\)]|\[.+?\]/g;
+var rePartsMatcher = /\.\w+|\.\:\w+|\/+\w+|\/\:\w+({.+?})?|\:\w+({.+?})?|\(.+?\)/g,
+    rePartMatcher = /\:?\w+|{.+?}/g,
+    rePartReplacer = /[\(\)]|\{.+?\}/g;
 
 
 module.exports = pathToRegExp;
@@ -41,8 +41,9 @@ function pathToRegExp(path, params, end) {
                 part = subParts[0];
 
                 if (part[0] === ":") {
-                    subRegexp = subParts[1] || "[a-zA-Z0-9-_]";
-                    pattern += "(" + subRegexp + "+?)";
+                    subRegexp = subParts[1];
+                    subRegexp = subRegexp ? subRegexp.slice(1, -1) : "[a-zA-Z0-9-_]+";
+                    pattern += "(" + subRegexp + "?)";
                     params[params.length] = new Param(part.slice(1), subRegexp, false);
                 } else {
                     pattern += part;
@@ -57,8 +58,9 @@ function pathToRegExp(path, params, end) {
                 part = subParts[0];
 
                 if (part[0] === ":") {
-                    subRegexp = subParts[1] || "[a-zA-Z0-9-_]";
-                    pattern += "(" + subRegexp + "+)";
+                    subRegexp = subParts[1];
+                    subRegexp = subRegexp ? subRegexp.slice(1, -1) : "[a-zA-Z0-9-_]+";
+                    pattern += "(" + subRegexp + ")";
                     params[params.length] = new Param(part.slice(1), subRegexp, true);
                 } else {
                     pattern += part;
@@ -84,23 +86,22 @@ pathToRegExp.format = function(path) {
         i = -1,
         length = parts.length - 1,
         fmt = "",
-        part, optional;
+        part;
 
     while (i++ < length) {
         part = parts[i];
 
         if (part) {
-            optional = false;
-            if (part[0] === "(") {
-                optional = true;
-            }
+            if (part[0] !== "(") {
+                part = part.replace(rePartReplacer, "");
 
-            part = part.replace(rePartReplacer, "");
-
-            if (part[1] === ":") {
-                fmt += (optional ? "" : part[0]) + "%s";
-            } else {
-                fmt += part;
+                if (part.charAt(1) === ":") {
+                    fmt += part.charAt(0) + "%s";
+                } else if (part.charAt(0) === ":") {
+                    fmt += "%s";
+                } else {
+                    fmt += part;
+                }
             }
         }
     }

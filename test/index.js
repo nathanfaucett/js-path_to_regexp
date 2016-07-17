@@ -3,10 +3,10 @@ var tape = require("tape"),
 
 
 tape("pathToRegExp(path: String[, params: Array[, end: Boolean]])", function(assert) {
-    var regExp = pathToRegExp("/parent/parent_:parentId[0-9]"),
+    var regExp = pathToRegExp("/parent/parent_:parentId{[0-9]+}"),
         regExpParams = regExp.params,
 
-        endRegExp = pathToRegExp("/parent/parent_:parentId[0-9]/child/:id[0-9](.:format)", true),
+        endRegExp = pathToRegExp("/parent/parent_:parentId{[0-9]+}/child/:id{[0-9]+}(.:format)", true),
         endRegExpParams = endRegExp.params;
 
     assert.equal(regExp.test("/parent/parent_1/child/1"), true);
@@ -14,7 +14,7 @@ tape("pathToRegExp(path: String[, params: Array[, end: Boolean]])", function(ass
 
     assert.deepEqual(regExpParams, [{
         name: "parentId",
-        regexp: "[0-9]",
+        regexp: "[0-9]+",
         required: true
     }]);
 
@@ -24,17 +24,22 @@ tape("pathToRegExp(path: String[, params: Array[, end: Boolean]])", function(ass
 
     assert.deepEqual(endRegExpParams, [{
         name: "parentId",
-        regexp: "[0-9]",
+        regexp: "[0-9]+",
         required: true
     }, {
         name: "id",
-        regexp: "[0-9]",
+        regexp: "[0-9]+",
         required: true
     }, {
         name: "format",
-        regexp: "[a-zA-Z0-9-_]",
+        regexp: "[a-zA-Z0-9-_]+",
         required: false
     }]);
+
+    assert.equal(
+        pathToRegExp.format("/parent/parent_:parentId{[0-9]+}/child/:id{[0-9]+}(.:format)"),
+        "/parent/parent_%s/child/%s"
+    );
 
     assert.end();
 });

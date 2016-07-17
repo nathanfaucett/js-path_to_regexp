@@ -1,21 +1,19 @@
-pathToRegexp
+pathToRegExp
 =======
 
-pathToRegexp for the browser and node.js
+pathToRegExp for the browser and node.js
 
 
 ```javascript
-var pathToRegexp = require("@nathanfaucett/path_to_regexp");
+var pathToRegExp = require("@nathanfaucett/path_to_regexp");
 
 
 var params = [],
-
-    regexp = pathToRegexp("/parent/:parentId", params, false),
-
-    regexpEnd = pathToRegexp("/parent/:parentId/child/:id", params, true);
+    regexp = pathToRegExp("/parent/:parentId{[0-9]+}", params, false),
+    regexpEnd = pathToRegExp("/parent/:parentId{[0-9]+}/child/:id{[0-9]+}(.:format{\\w+})", true);
 
 
 console.log(regexp.exec("/parent/1/child/1"));
-console.log(regexpEnd.exec("/parent/1/child/1"));
+console.log(regexpEnd.exec("/parent/1/child/1.json"));
 
 ```
